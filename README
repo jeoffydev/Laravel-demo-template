@@ -1,0 +1,30 @@
+## Docker command to access bash (container name)
+docker exec -it laravel-docker bash
+
+https://www.youtube.com/watch?v=V-MDfE1I6u0
+
+# Add .htaccess
+<IfModule mod_rewrite.c>
+    RewriteEngine on
+    RewriteCond %{REQUEST_URI} !^public
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+# storage issue in windows
+docker exec -it laravel-docker bash -> root@2f906f6818c6:/var/www/html# docker bash
+cd /var/www/html/
+chgrp -R www-data bootstrap/ storage/ storage/logs/
+chmod -R g+w bootstrap/ storage/ storage/logs/
+cd bootstrap/
+find -type d -exec chmod g+s {} +
+cd ..
+cd storage/
+find -type d -exec chmod g+s {} +
+cd ..
+cd storage/logs/
+sudo find -type d -exec chmod g+s {} +
+
+
+Generate key:
+php artisan key:generate
+Note that if the .env file contains the key but you are still getting an application key error, then run php artisan config:cache to clear and reset the config.
