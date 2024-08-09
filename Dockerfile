@@ -1,4 +1,4 @@
-FROM php:8.1.0-apache
+FROM php:8.3.10-apache
 WORKDIR /var/www/html
 
 # Mod Rewrite
@@ -20,7 +20,17 @@ RUN apt-get update -y && apt-get install -y \
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # PHP Extension
-RUN docker-php-ext-install gettext intl pdo_mysql gd
+ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
-RUN docker-php-ext-configure gd --enable-gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) gd
+RUN install-php-extensions gd xdebug
+
+RUN docker-php-ext-install mysqli pdo pdo_mysql && docker-php-ext-enable pdo_mysql
+
+COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/bin/
+
+RUN install-php-extensions zip
+RUN install-php-extensions intl
+RUN install-php-extensions gd
+RUN install-php-extensions sodium
+RUN install-php-extensions xdebug
+
